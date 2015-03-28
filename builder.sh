@@ -16,8 +16,10 @@ main () {
         ;;
       3|postinstall)
         postinstall
+        ;;
       hot|hot_install)
         hot_install
+        ;;
       quick|quick_install)
         quick_install
         ;;
