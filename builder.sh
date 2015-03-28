@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ./variables.sh
+. $(dirname `readlink -f "$0"` 2> /dev/null || pwd)/variables.sh
 
 main () {
   for param in "$@" ; do
@@ -16,15 +16,22 @@ main () {
         ;;
       3|postinstall)
         postinstall
+      hot|hot_install)
+        hot_install
+      quick|quick_install)
+        quick_install
+        ;;
+      reboot|multi|multi_user_reboot)
+        multi_user_reboot
+        ;;
+      single|single_user_reboot)
+        single_user_reboot
         ;;
       -v=*|--value=*)
         VALUE="${i#*=}"
         ;;
       -f|--flag)
         FLAG=1
-        ;;
-      hello)
-        hello
         ;;
       --)
         break
@@ -56,7 +63,7 @@ install () {
   single_user_bootstrap
   install_freebsd_world
   delete_obsolete_files
-  muilti_user_reboot
+  multi_user_reboot
 }
 
 postinstall () {
@@ -64,8 +71,28 @@ postinstall () {
   delete_obsolete_libraries
 }
 
-hello () {
-  echo "Hello, world!"
+hot_install () {
+  adjust_clock
+  update_all
+  build_freebsd_all
+  install_freebsd_kernel
+  install_freebsd_world
+  delete_obsolete_files
+  rebuild_all_ports
+  delete_obsolete_libraries
+}
+
+quick_install () {
+  adjust_clock
+  update_freebsd_source
+  clean_build_environment
+  build_freebsd_world
+  backup_freebsd_kernel
+  build_freebsd_kernel
+  install_freebsd_kernel
+  install_freebsd_world
+  delete_obsolete_files
+  delete_obsolete_libraries
 }
 
 update_all () {
