@@ -1,0 +1,6 @@
+# kernel configurations files
+*_KERNEL
+
+# vim
+*.swp
+
