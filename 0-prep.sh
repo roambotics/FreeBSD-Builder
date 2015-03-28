@@ -1,15 +1,17 @@
 #!/bin/sh
 
+. ./variables.sh
+
 echo 'Updating FreeBSD source code...'
-svn up /usr/src
+$SVN up $FREEBSD_SRC_DIR
 echo 'Updating FreeBSD source code... Done.'
 
 echo 'Updating documentation source...'
-svn up /usr/doc
+$SVN up $DOC_SRC_DIR
 echo 'Updating documentation source... Done.'
 
 echo 'Updating ports...'
-svn up /usr/ports
+$SVN up $PORTS_SRC_DIR
 portmaster --no-confirm -m BATCH=yes -aD
 #portmaster --no-confirm -m BATCH=yes -m DISABLE_VULNERABILITIES=yes -aD
 portsclean -CD
