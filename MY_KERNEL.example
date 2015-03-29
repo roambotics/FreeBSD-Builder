@@ -1,0 +1,32 @@
+### Create a symbolic link to this file.
+#
+# KERNEL_CONFIG=`hostname | tr '[:lower:]' '[:upper:]'`_KERNEL
+# cd /usr/src/sys/amd64/conf/
+# ln -s /root/install-freebsd/$KERNEL_CONFIG
+
+include GENERIC
+ident MY_MACHINE
+
+# AT Keyboard
+device          atkbd
+options         ATKBD_DFLT_KEYMAP
+makeoptions     ATKBD_DFLT_KEYMAP=jp.106
+
+# USB Keyboard
+device          ukbd
+options         UKBD_DFLT_KEYMAP
+makeoptions     UKBD_DFLT_KEYMAP=jp.106
+
+# ALTQ for pf
+# http://www.openbsd.org/faq/pf/queueing.html
+options         ALTQ
+#options         ALTQ_CBQ        # Class Based Queuing (CBQ)
+#options         ALTQ_RED        # Random Early Detection (RED)
+#options         ALTQ_RIO        # RED In/Out
+#options         ALTQ_HFSC       # Hierarchical Packet Scheduler (HFSC)
+options         ALTQ_PRIQ       # Priority Queuing (PRIQ)
+
+# Ref: https://forums.pcbsd.org/archive/index.php/t-2988.html
+options         VESA # Vesa Support for Splash
+options         SC_PIXEL_MODE # add support for the raster tex
+
