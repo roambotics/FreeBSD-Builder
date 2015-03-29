@@ -1,7 +1,8 @@
 #!/bin/sh
 
-. $(dirname `readlink -f "$0"` 2> /dev/null || pwd)/variables.sh
-. $(dirname `readlink -f "$0"` 2> /dev/null || pwd)/secure_variables.sh
+TOP_DIR=$(dirname `readlink -f "$0"` 2> /dev/null || pwd)
+. $TOP_DIR/variables.sh
+. $TOP_DIR/secure_variables.sh
 
 main () {
   for param in "$@" ; do
@@ -36,6 +37,9 @@ main () {
       bootstrap_rc)
         bootstrap_rc
         ;;
+      link|bootstrap_kernel_config)
+        bootstrap_kernel_config
+        ;;
       reboot|multi|multi_user_reboot)
         multi_user_reboot
         ;;
@@ -50,6 +54,9 @@ main () {
         ;;
       ath0|ath0_wifi_reset)
         single_user_bootstrap
+        ;;
+      clear)
+        clear
         ;;
       -v=*|--value=*)
         VALUE="${i#*=}"
@@ -75,6 +82,7 @@ bootstrap () {
   bootstrap_ports
   bootstrap_doc
   bootstrap_freebsd_src
+  bootstrap_kernel_config
   bootstrap_tools
   update_all
 }
@@ -157,6 +165,12 @@ bootstrap_freebsd_src () {
   $SVN co $FREEBSD_SRC_SERVER/$FREEBSD_SRC_PROJECT $FREEBSD_SRC_DIR
   $SVN up $FREEBSD_SRC_DIR
   echo "Tracking FreeBSD $FREEBSD_SRC_PROJECT... Done."
+}
+
+bootstrap_kernel_config () {
+  echo "Bootstrapping kernel configuration..."
+  (cd $FREEBSD_SRC_DIR/sys/amd64/conf/; rm -f $KERNEL_CONFIG; ln -s $TOP_DIR/$KERNEL_CONFIG)
+  echo "Bootstrapping kernel configuration... Done."
 }
 
 bootstrap_tools () {
