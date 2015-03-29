@@ -2,6 +2,11 @@
 
 # This file contains variables that are either specific to each machine or sensitive in nature.
 
+# List of ports to install with portmaster.  Used after a failure.
+PORTS_TO_INSTALL=
+
 # kernel configuration to use
-KERNEL_CONFIG=MY_KERNEL
+HOSTNAME=hostname
+KERNEL_CONFIG=HOSTNAME_KERNEL
+KEYMAP=en
 

@@ -5,17 +5,17 @@
 # ln -s /root/install-freebsd/$KERNEL_CONFIG
 
 include GENERIC
-ident MY_MACHINE
+ident MY_HOSTNAME
 
 # AT Keyboard
 device          atkbd
 options         ATKBD_DFLT_KEYMAP
-makeoptions     ATKBD_DFLT_KEYMAP=jp.106
+makeoptions     ATKBD_DFLT_KEYMAP=en
 
 # USB Keyboard
 device          ukbd
 options         UKBD_DFLT_KEYMAP
-makeoptions     UKBD_DFLT_KEYMAP=jp.106
+makeoptions     UKBD_DFLT_KEYMAP=en
 
 # ALTQ for pf
 # http://www.openbsd.org/faq/pf/queueing.html

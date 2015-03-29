@@ -1,7 +1,9 @@
 #!/bin/sh
 
 # kernel configuration to use
-KERNEL_CONFIG=`hostname | tr '[:lower:]' '[:upper:]'`_KERNEL
+HOSTNAME=`hostname 2> /dev/null || echo "hostname"`
+KERNEL_CONFIG=`echo $HOSTNAME | tr '[:lower:]' '[:upper:]'`_KERNEL
+KEYMAP=en
 
 # svnlite is part of FreeBSD 10.1+ base. Change this value to "svn" and install the devel/subversion port if building on an older version of FreeBSD.
 SVN=svnlite

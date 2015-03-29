@@ -24,11 +24,32 @@ main () {
       quick|quick_install)
         quick_install
         ;;
+      update|update_ports)
+        update_all
+        ;;
+      resume|resume_portmaster)
+        resume_portmaster
+        ;;
+      bootstrap)
+        bootstrap
+        ;;
+      bootstrap_rc)
+        bootstrap_rc
+        ;;
       reboot|multi|multi_user_reboot)
         multi_user_reboot
         ;;
       single|single_user_reboot)
         single_user_reboot
+        ;;
+      repair|repair_filesystem)
+        repair_filesystem
+        ;;
+      sub|single_user_bootstrap)
+        single_user_bootstrap
+        ;;
+      ath0|ath0_wifi_reset)
+        single_user_bootstrap
         ;;
       -v=*|--value=*)
         VALUE="${i#*=}"
@@ -48,6 +69,14 @@ main () {
 
 usage () {
   echo "Usage: ..."
+}
+
+bootstrap () {
+  bootstrap_ports
+  bootstrap_doc
+  bootstrap_freebsd_src
+  bootstrap_tools
+  update_all
 }
 
 prep () {
@@ -98,6 +127,61 @@ quick_install () {
   delete_obsolete_libraries
 }
 
+bootstrap_ports () {
+  echo "Boostrapping ports..."
+  # Bootstrap Ports
+  rm -rf $PORTS_SRC_DIR
+  $SVN co $PORTS_SRC_SERVER/$PORTS_SRC_PROJECT $PORTS_SRC_DIR
+  $SVN up $PORTS_SRC_DIR
+  cd $PORTS_SRC_DIR/ports-mgmt/portmaster && make config-recursive && make config-recursive && make install clean
+  portmaster $PORTMASTER_FLAGS ports-mgmt/portupgrade
+  #portmaster $PORTMASTER_FLAGS devel/subversion
+  echo "Boostrapping ports... Done."
+}
+
+bootstrap_doc () {
+  echo "Boostrapping doc..."
+  # Install Documentation
+  rm -rf $DOC_SRC_DIR
+  $SVN co $DOC_SRC_SERVER/$DOC_SRC_PROJECT $DOC_SRC_DIR
+  $SVN up $DOC_SRC_DIR
+  portmaster $PORTMASTER_FLAGS textproc/docproj
+  (cd $DOC_SRC_DIR; make install clean)
+  echo "Boostrapping doc... Done."
+}
+
+bootstrap_freebsd_src () {
+  echo "Tracking FreeBSD $FREEBSD_SRC_PROJECT..."
+  # Install Source
+  rm -rf $FREEBSD_SRC_DIR
+  $SVN co $FREEBSD_SRC_SERVER/$FREEBSD_SRC_PROJECT $FREEBSD_SRC_DIR
+  $SVN up $FREEBSD_SRC_DIR
+  echo "Tracking FreeBSD $FREEBSD_SRC_PROJECT... Done."
+}
+
+bootstrap_tools () {
+  echo "Boostrapping tools..."
+  # Install Development Tools
+  portmaster $PORTMASTER_FLAGS devel/git
+  portmaster $PORTMASTER_FLAGS shells/bash editors/vim ftp/curl ftp/wget sysutils/screen
+  #portmaster $PORTMASTER_FLAGS devel/py-setuptools33 devel/py-pip devel/py-virtualenv devel/py-virtualenvwrapper
+  #portmaster $PORTMASTER_FLAGS www/nginx www/lynx security/tor
+  echo "Boostrapping tools... Done."
+}
+
+bootstrap_rc () {
+  echo "Boostrapping /etc/rc.conf..."
+  echo "hostname=\"$HOSTNAME\"" >> /etc/rc.conf
+  echo "keymap=\"$KEYMAP\"" >> /etc/rc.conf
+  echo 'ifconfig_em0="DHCP"' >> /etc/rc.conf
+  echo 'ifconfig_em0_ipv6="inet6 accept_rtadv"' >> /etc/rc.conf
+  echo 'sshd_enable="YES"' >> /etc/rc.conf
+  echo 'ntpd_enable="YES"' >> /etc/rc.conf
+  echo 'powerd_enable="YES"' >> /etc/rc.conf
+  #echo 'moused_enable="YES"' >> /etc/rc.conf
+  echo "Boostrapping /etc/rc.conf... Done."
+}
+
 update_all () {
   update_freebsd_source
   update_doc_source
@@ -133,6 +217,16 @@ rebuild_all_ports () {
   echo 'Rebuilding ports... Done.'
 }
 
+resume_portmaster () {
+  echo 'Resuming portmaster...'
+  $SVN up $PORTS_SRC_DIR
+  #portmaster --no-confirm -m BATCH=yes -m DISABLE_VULNERABILITIES=yes -D $PORTS_TO_INSTALL
+  portmaster --no-confirm -m BATCH=yes -D $PORTS_TO_INSTALL 
+  # update outdated ports
+  #portmaster --no-confirm -m BATCH=yes -aD
+  echo 'Resuming portmaster... Done.'
+}
+
 multi_user_reboot() {
   echo 'Rebooting system...'
   shutdown -r +1
@@ -148,22 +242,46 @@ single_user_reboot () {
 }
 
 single_user_bootstrap () {
+  #repair_filesystem
   mount_rw_filesystem
+  mount_fdescfs_and_proc
+  initialize_devices
   adjust_clock
+}
+
+repair_filesystem () {
+  echo 'Filesystem check...'
+  fsck -p
+  echo 'Filesystem check... Done.'
 }
 
 mount_rw_filesystem () {
   echo 'Mounting RW filesystem...'
   #fsck -p
   mount -u /
-  mount -a -t ufs 
+  #mount -a -t ufs 
+  mount -a
   swapon -a
   echo 'Mounting RW filesystem... Done.'
+}
+
+mount_fdescfs_and_proc () {
+  echo "Mounting fdescfs and proc ..."
+  mount -t fdescfs fdesc /dev/fd
+  mount -t procfs proc /proc
+  echo "Mounting fdescfs and proc ... Done."
+}
+
+initialize_devices () {
+  echo "Initializing devices..."
+  service devd start
+  echo "Initializing devices..."
 }
 
 adjust_clock () {
   echo 'Adjusting clock...'
   adjkerntz -i
+  ntpdate -v -b in.pool.ntp.org
   echo 'Adjusting clock... Done.'
 }
 
@@ -248,6 +366,15 @@ delete_obsolete_libraries () {
   (cd $FREEBSD_SRC_DIR; make delete-old-libs)
   (cd $FREEBSD_SRC_DIR; make -DWITH_ATF delete-old-libs)
   echo 'Deleting obsolete libraries... Done.'
+}
+
+ath0_wifi_reset () {
+  echo "Resetting ath0 WiFi..."
+  ifconfig wlan0 destroy
+  pkill -9 wpa_supplicant
+  ifconfig wlan0 create wlandev ath0
+  wpa_supplicant -i wlan0 -c /etc/wpa_supplicant.conf &
+  echo "Resetting ath0 WiFi... Done."
 }
 
 main $@
