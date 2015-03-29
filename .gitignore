@@ -1,3 +1,10 @@
+# sensitive or marching specific data
+# git config --global alias.apply-gitignore "!git ls-files -ci --exclude-standard -z | xargs -0r git rm --cached"
+# Reference:
+# http://stackoverflow.com/questions/7527982/applying-gitignore-to-committed-files
+# http://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
+secure_variables.sh
+
 # kernel configurations files
 *_KERNEL
 
