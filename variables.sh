@@ -2,7 +2,6 @@
 
 # kernel configuration to use
 KERNEL_CONFIG=`hostname | tr '[:lower:]' '[:upper:]'`_KERNEL
-KERNEL_CONFIG=SPECTRE_KERNEL
 
 # svnlite is part of FreeBSD 10.1+ base. Change this value to "svn" and install the devel/subversion port if building on an older version of FreeBSD.
 SVN=svnlite

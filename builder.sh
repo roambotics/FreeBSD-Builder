@@ -1,6 +1,7 @@
 #!/bin/sh
 
 . $(dirname `readlink -f "$0"` 2> /dev/null || pwd)/variables.sh
+. $(dirname `readlink -f "$0"` 2> /dev/null || pwd)/secure_variables.sh
 
 main () {
   for param in "$@" ; do
