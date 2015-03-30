@@ -11,7 +11,7 @@ Also contains random utility scripts because I wanted to put everything I had in
   svnlite co svn://svn.freebsd.org/ports/head /usr/ports
   cd /usr/ports/ports-mgmt/portmaster && make config-recursive && make config-recursive && make install clean
   portmaster ports-mgmt/portupgrade devel/git editors/vim
-  git clone git@github.com:Sennue/FreeBSD-Builder.git builder
+  git clone git@github.com:Sennue/FreeBSD-Builder.git ~/builder
   cd ~/builder
   cp HOSTNAME_KERNEL.example HOSTNAME_KERNEL # use actual hostname
   vim HOSTNAME_KERNEL # configure file
