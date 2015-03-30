@@ -1,16 +1,17 @@
-# FreeBSD-Bootstrap #
+# FreeBSD-Builder #
 
 Staged scripts to build FreeBSD wrapped up into one executable file (builder.sh).
-Also contains random utility scripts because I wanted to put everything in one place.
+Also contains random utility scripts because I wanted to put everything I had in one place.
 
 ## Initial Machine Bootstrapping ##
 ```sh
+  # run these commands once after a minimal install
   su
   sh
   svnlite co svn://svn.freebsd.org/ports/head /usr/ports
   cd /usr/ports/ports-mgmt/portmaster && make config-recursive && make config-recursive && make install clean
   portmaster ports-mgmt/portupgrade devel/git editors/vim
-  git clone git@github.com:Sennue/FreeBSD-Bootstrap.git builder
+  git clone git@github.com:Sennue/FreeBSD-Builder.git builder
   cd ~/builder
   cp HOSTNAME_KERNEL.example HOSTNAME_KERNEL # use actual hostname
   vim HOSTNAME_KERNEL # configure file
