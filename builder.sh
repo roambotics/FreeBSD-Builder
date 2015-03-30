@@ -52,6 +52,9 @@ main () {
       sub|single_user_bootstrap)
         single_user_bootstrap
         ;;
+      clock|adjust_clock)
+        adjust_clock
+        ;;
       ath0|ath0_wifi_reset)
         single_user_bootstrap
         ;;
